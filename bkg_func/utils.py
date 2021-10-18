@@ -41,7 +41,7 @@ def FilterTracks(traj_table, minlen):
 
 def SingleTrack(data, track):
     '''select one track from all_tracks table'''
-    track = data[data['TRACK_ID'] == track]     # track selection
+    track = data[data['TRACK_ID'] == track]
     print('track with {} steps'.format(len(track)))
     
     return track

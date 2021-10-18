@@ -12,12 +12,16 @@ from bkg_func.conf_ratio_func import PlotConfinedRegions, ComputeSubSegmentStats
 from bkg_func.multiple_track_func import AnalyzeAllTracks, ExtractConfinementLifetimes, PlotLifetimes, TrimEnds
 
 
-def ReadTracks(file, minlen = 30):
+def ReadTracks(file, minlen):
+    '''reads file into a dataframe, extracts frame rate and number of tracks'''
     table, rate, n_tracks = read_trackmate_xml_tracks(file)
     
-    print('{:} tracks (filter = {} frames)'.format(int(n_tracks), minlen))
-    
-    return FilterTracks(table, 30), rate, n_tracks
+    # apply filter for minimum lenght
+    table = FilterTracks(table, minlen)
+    n_tracks = table.TRACK_ID.unique().max() 
+    print('{:} tracks (filter = {} frames)'.format(int(n_tracks), minlen))    
+
+    return table, rate, n_tracks
 
 def TrajectoryClassification(all_tracks, track, thres, w, frame_rate, t_thresh):
         
@@ -36,6 +40,7 @@ def TrajectoryClassification(all_tracks, track, thres, w, frame_rate, t_thresh):
 def TrajectoryClassificationAllTracks(file, min_track_len = 30, tracks = 30, window = 5, p_thres = 1500, t_thres = 0.5, trim_trajectory_ends = False):
     
     all_tracks, frame_rate, n_tracks = ReadTracks(file, minlen = min_track_len)
+    
     print('confinement threshold: {} '.format(p_thres))
     print('time threshold: {} frames ~ {}s'.format(np.ceil(t_thres / frame_rate), t_thres))
     
