@@ -1,4 +1,4 @@
-'''INSERT SHORT DESCRIPTION OF COMMANDS'''
+'''set of functions to run the analysis on multiple tracks (XLM file) at once '''
 
 import pandas as pd
 import seaborn as sns
@@ -7,7 +7,12 @@ from bkg_func.conf_ratio_func import ComputeConfinementRatioScore, FindTransitio
 from bkg_func.conf_ratio_func import ComputeSubSegmentStats
 
 
-def AnalyzeAllTracks(all_tracks, frame_rate, tracks = -1, w = 10, p_thres = 1500):
+def AnalyzeAllTracks(all_tracks, frame_rate, tracks = -1, w = 10, p_thres = 1500, t_thres = 0.5):
+    '''incorporates functions from single track analysis into a for loop to read all tracks
+    tracks: number of tracks to analyze. default = -1 (all tracks)
+    w: window size;
+    p_thres: value above which a subsegment is considered confined (dimensionless)
+    t_thres: minimal time (sec) a confined event needs to last to be considered '''
     
     #print('rolling window: {0:.4} sec'.format(window_size * frame_rate))
     
@@ -37,7 +42,7 @@ def AnalyzeAllTracks(all_tracks, frame_rate, tracks = -1, w = 10, p_thres = 1500
 
             try: 
                 track_score = ComputeConfinementRatioScore(track, conf_ratio_thres = p_thres, rol_window = w, show_progress = False)
-                track_score_denoised = DenoiseTransitionPoints(track_score , FindTransitionPoints(track_score))
+                track_score_denoised = DenoiseTransitionPoints(track_score , FindTransitionPoints(track_score), frame_rate, t_thres)
                 track_score_denoised_stats = ComputeSubSegmentStats(track_score_denoised, frame_rate)
 
                 all_tracks_stats.append(track_score_denoised_stats)
@@ -49,6 +54,8 @@ def AnalyzeAllTracks(all_tracks, frame_rate, tracks = -1, w = 10, p_thres = 1500
     return all_tracks_stats
 
 def ExtractConfinementLifetimes(all_tracks_stats):
+    '''takes the output from the function AnalyzeAllTracks and returns
+    a dataframe with the lifetimes of confinement vs. free diffusion'''
     
     tracks_lifetimes_confined = []
     tracks_lifetimes_free = []
@@ -72,6 +79,8 @@ def ExtractConfinementLifetimes(all_tracks_stats):
     return lifetimes_df
 
 def ExtractConfinementCounts(all_tracks_stats):
+    '''takes the output from the function AnalyzeAllTracks and returns
+    a dataframe with the number and % of confiinement events'''
     
     tracks_w_confinement = 0
     tracks_wo_confinement = 0
@@ -89,7 +98,9 @@ def ExtractConfinementCounts(all_tracks_stats):
     return tracks_w_confinement
 
 def PlotLifetimes(lifetimes, colors = ['steelblue', 'crimson']):
-        
+    '''takes the output from the ExtractConfinementLifetimes to 
+    plot confinement vs. free diffusion lifetimes'''
+    
     fig, ax = plt.subplots(figsize = (1.5,2), dpi = 150)
     
     sns.barplot(data = lifetimes,

@@ -1,13 +1,11 @@
-'''UTILS - SHORT DESCRIPTION'''
+'''support functions'''
 
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
-from matplotlib.ticker import FormatStrFormatter
 
 def read_trackmate_xml_tracks(xml_file):
-    """Reads tracks from trackmate xml track file and converts into a user-friendly DataFrame """
+    """import tracks from trackmate xml track file and converts into a user-friendly DataFrame """
     from xml.etree import cElementTree as ET
     tracks = ET.parse(xml_file)
     frame_interval = float(tracks.getroot().attrib["frameInterval"])
@@ -42,21 +40,23 @@ def FilterTracks(traj_table, minlen):
     return traj_table
 
 def SingleTrack(data, track):
+    '''select one track from all_tracks table'''
     track = data[data['TRACK_ID'] == track]     # track selection
     print('track with {} steps'.format(len(track)))
     
     return track
 
 def plotSingleTrack(track, color = 'peachpuff', start = 0 , end = -1):
+   '''plot a single track, from start to end position'''
    
-    fig, ax = plt.subplots(figsize = (4,3), dpi = 120)
+   fig, ax = plt.subplots(figsize = (4,3), dpi = 120)
     
-    # plot window to add sub segments
-    if end == -1: end = track.shape[0]
-    track = track.reset_index(drop=True)
-    track = track.loc[start:end]
+   # plot window to add sub segments
+   if end == -1: end = track.shape[0]
+   track = track.reset_index(drop=True)
+   track = track.loc[start:end]
     
-    plt.plot(track.POSITION_X, track.POSITION_Y, '-o', lw = 2, color = color,
+   plt.plot(track.POSITION_X, track.POSITION_Y, '-o', lw = 2, color = color,
              markersize = 6, markeredgecolor = 'black', markeredgewidth = 0.8); plt.axis('off');
      
 def color_pick(p, thres = 1000, colors = ['steelblue', 'crimson']):

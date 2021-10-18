@@ -1,9 +1,9 @@
-### Functions to Compute Confinement Ratio of a Given Track/segment
+'''set of functions to run the confinement ratio analysis on a single track 
+from an XLM file with trajectories '''
 
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
 from matplotlib.ticker import FormatStrFormatter
 from scipy.spatial import ConvexHull
 from bkg_func.utils import ComputeDirectionality
@@ -58,10 +58,9 @@ def ConfinementRatio(track_table, X='POSITION_X', Y = 'POSITION_Y'):
     
     return segment_pc
 	
-	
 # functions to compute and visualize confinement ratio along a given track
 
-def TuneConfinementThreshold(track, frame_rate, conf_thres = 1500, windows = [5, 10, 15]):
+def TuneConfinementThreshold(track, frame_rate, conf_thres = 1500, windows = [5, 8, 12]):
     '''computes the confinement ratio using different window sizes (windows)
     and returns a list with conf_ratio per position for each window size'''
     
@@ -86,7 +85,8 @@ def TuneConfinementThreshold(track, frame_rate, conf_thres = 1500, windows = [5,
     
     return conf_ratios
 
-def PlotParameterVSrollingWindow(param, thres = 1500, ylim = None):
+def PlotParameterTunnig(param, thres = 1500, ylim = None):
+    '''takes the output of TuneConfinementThreshold to plot the results'''
     
     rol_windows = np.unique([j for i,j in param]) # reads each par coef_ratio, window_size
     df = pd.DataFrame(param, columns=['conf_ratio','window_size']) # converts into a pretty table
@@ -174,7 +174,7 @@ def ComputeConfinementRatioScore(track, conf_ratio_thres = 1500, rol_window = 5,
     return conf_ratio_matrix
 
 def FindTransitionPoints(track_score, col = 'confined'):
-    'finds transition points along column col'
+    ''''finds transition points along column col'''
     
     score_matrix = track_score.copy()
 
@@ -190,12 +190,13 @@ def FindTransitionPoints(track_score, col = 'confined'):
 
     return transition_points
 
-def DenoiseTransitionPoints(track_score, transition_points, col = 'confined', min_len = 10):
-    '''finds transition points along column 'col', discarding short subsegments (len below min_len)
-    returns score_matrix with only significant transitions'''
+def DenoiseTransitionPoints(track_score, transition_points,  frame_rate, t_thres = 0.5,  col = 'confined',):
+    '''finds transition points along column 'col', discarding short subsegments (shorter than t_thres in sec)
+    uses orginal transition_points as input. returns a new track_score with only significant transitions'''
 
     track_score = track_score.copy()
-
+    min_len = np.ceil(t_thres / frame_rate)
+    
     confined_tracks_index = []
     
     # rationale
@@ -219,6 +220,7 @@ def DenoiseTransitionPoints(track_score, transition_points, col = 'confined', mi
     return track_score
 
 def PlotConfinedRegions(track, track_score, col = 'confined', colors = ['crimson','peachpuff']):
+    '''takes original track table and track_score table to plot trajectory color code'''
     
     fig, ax = plt.subplots(figsize = (4,3), dpi = 120)
     
@@ -295,8 +297,10 @@ def ShowStats(stats_table):
         
         n_conf = stats_table['mode'].value_counts().confined
         tau_conf = stats_table[stats_table['mode'] == 'confined']['lifetime (s)'].mean()
-        print('{} confined events; avg lifetime = {:.3}s'.format(n_conf, tau_conf))
+        area_conf = stats_table[stats_table['mode'] == 'confined']['cage_area (nm2)'].mean()
+        
+        print('{} confined events; avg lifetime = {:.3}s; avg cage_area = {:.3} nm2'.format(n_conf, tau_conf, area_conf))
         
     else:
         print('no confined events') 
-    return
+    return 
