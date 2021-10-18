@@ -7,24 +7,25 @@ Inspect Tracks Individually and Tune Parameters
 **Multi-Track-Confinement-Classification Notebook** <br> 
 Run Analysis for all tracks in a XML file: returns the lifetime of confined segments vs. free diffusion segments
 
-#### Overview
+### Overview
 
-Here, we use the confinement ratio (p) to identify periods of confined motion along a free diffusion trajectory (when they exist).
-p is defined as the **length of the trajectory in a short time window and the surface area that it occupies.**
-This gives an estimate of the degree of free movement that a molecule displays in a period independently of its global diffusivity.
-A rolling window with size w is used to compute p for each subsegment. Each time point will have a characteristic p, based on the behavior of the 
-following w time points. Periods of confinement are identified by setting a threshold (p_thres) corresponding to a certain confinement area size, 
-since p scales with the size of the confinement area. Then it is possible to calculate the frequency and duration of confinement periods and to localize them in space
-This approach is adapted from Renner et al. (2017) and implemented here as an easy-to-use python script.
+Here, we use the confinement ratio (*p*) to identify periods of confined motion along a free diffusion trajectory (when they exist).
+*p* is defined as the **length of the trajectory in a short time window and the surface area that it occupies.**
+This gives an estimate of the degree of free movement that a molecule displays in a given period, regardless of its global diffusivity.
+A rolling window with size *w* is used to compute *p* for each time point, based on the behavior of the following *w* time points (i.e subsegments of the main trajectory).
+Periods of confinement are identified by setting a threshold (*p_thres*) corresponding to a certain confinement area size, 
+since *p* scales with the size of the confinement area. Then it is possible to calculate the frequency and duration of confinement periods 
+and to localize them in space. This approach is adapted from Renner et al. (2017) and implemented here as an easy-to-use python script.
 
-The use of a threshold value of p (p_thresh) and a minimal duration above this threshold (t_thresh) can suppress the detection of apparent nonrandom behaviors without excluding the detection 
-of real confinement. These parameters depend on the acquisition frequency and the characteristic time of confinement. 
+The use of a threshold value for *p* (*p_thresh*) and a minimal duration above that threshold (*t_thresh*) to consider an event confined in space
+can suppress the detection of apparent non-random behaviors. These parameters depend on the acquisition frequency and the characteristic time of confinement. 
 Too large windows will not detect properly the confinement period, while the statistical uncertainty increases in shorter windows. 
 Thus, to accurately detect confinement periods, the window size should be adjusted accordingly to the acquisition rate and other experimental features.
 
 ### Parameters
 
-The script runs on a simple jupyther notebook using a XML file (contains trajectories and coordinates - typical TrackMate's output file Fiji)
+The script runs on a simple jupyther notebook using a XML file <br> 
+(contains trajectories and coordinates - typical TrackMate's output file Fiji)
 
 - window (w): is the length of the time window (in frames)
 - confinement ratio threshold (p_thres): value above which a subsegment is considered confined (dimensionless)
