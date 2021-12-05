@@ -48,8 +48,8 @@ def FitElipse(track_table, X='POSITION_X', Y = 'POSITION_Y'):
     return fit, hull.volume
 
 def ConfinementRatio(track_table, X='POSITION_X', Y = 'POSITION_Y'):
-    ''' relates the sum of the square displacements between successive time points 
-    by the total surface area of the track '''
+    ''' relates the sum of the square displacements between successive
+    time points by the total surface area of the track '''
     
     squared_distances = ComputeSquareDisplacement(track_table)
     cage, cage_area = FitElipse(track_table, X = X, Y = Y) 
@@ -85,7 +85,7 @@ def TuneConfinementThreshold(track, frame_rate, conf_thres = 1500, windows = [5,
     
     return conf_ratios
 
-def PlotParameterTunnig(param, thres = 1500, ylim = None):
+def PlotParameterTunnig(param, thres = 1500, ylim = None, log = False):
     '''takes the output of TuneConfinementThreshold to plot the results'''
     
     rol_windows = np.unique([j for i,j in param]) # reads each par coef_ratio, window_size
@@ -105,7 +105,7 @@ def PlotParameterTunnig(param, thres = 1500, ylim = None):
     ax.yaxis.set_major_formatter(FormatStrFormatter('%.0f'));
     
     # threhsold for confinement ratio
-    plt.hlines(y = thres, xmin = np.min(x), xmax = np.max(x), alpha = 0.2, ls = '--', color = 'gray')
+    plt.hlines(y = thres, xmin = np.min(x), xmax = np.max(x), alpha = 0.2, ls = '--', color = 'crimson')
     
     # fancy stuff
     ax.spines['top'].set_visible(False)
@@ -120,6 +120,9 @@ def PlotParameterTunnig(param, thres = 1500, ylim = None):
     else:
         ax.set_ylim([0, ylim])
         #'tracks with confined regions: {}/{}'.format(tracks_w_confinement, len(all_tracks_stats))
+        
+    if log == True: # set y-axis to log scale 
+        plt.yscale('symlog')
 	
 
 def ComputeConfinementRatioScore(track, conf_ratio_thres = 1500, rol_window = 5, coords = ['POSITION_X','POSITION_Y'], show_progress = True):
@@ -263,7 +266,13 @@ def ComputeSubSegmentStats(track_score_denoised, frame_rate, col = 'confined'):
     for i, pos in enumerate(transition_points[:-1]):
 
         sub_segment = track_score_denoised.iloc[transition_points[i]:transition_points[i+1]]
-
+        
+        # compute confinement ratio of each segment
+        if sub_segment.shape[0] > 5: 
+            conf_ratio = ConfinementRatio(sub_segment)
+        else:
+            conf_ratio = np.nan
+        
         # compute lifetime of each subsegment
         lifetime = sub_segment.shape[0] * frame_rate
 
@@ -278,26 +287,26 @@ def ComputeSubSegmentStats(track_score_denoised, frame_rate, col = 'confined'):
         # compute total distance of each subsegment
         
         if sub_segment.shape[0] > 5:
-            dist = ComputeDirectionality(sub_segment)[0] # in micron
+            dist = ComputeDirectionality(sub_segment)[0] * 1000 # in nanometer
         else: 
             dist = np.nan
             
         # add parameters to list
         
         if sub_segment[col].iloc[0] == True:
-            params.append(['confined', lifetime, cage_area, dist, sub_segment.shape[0]])
+            params.append(['confined', conf_ratio, lifetime, round(cage_area,0), round(dist,0), sub_segment.shape[0]])
         else:
-            params.append(['free_diff', lifetime, cage_area, dist, sub_segment.shape[0]])      
+            params.append(['free_diff', conf_ratio, lifetime, round(cage_area,0), sub_segment.shape[0]])      
             
-    return pd.DataFrame(params, columns=['mode','lifetime (s)','cage_area (nm2)', 'distance (um)', 'steps'])
+    return pd.DataFrame(params, columns=['mode', 'p_coeff_um-2', 'lifetime_s', 'area_nm2', 'distance_nm', 'steps'])
 
 def ShowStats(stats_table):
     
     if any(stats_table['mode'] == 'confined'):
         
         n_conf = stats_table['mode'].value_counts().confined
-        tau_conf = stats_table[stats_table['mode'] == 'confined']['lifetime (s)'].mean()
-        area_conf = stats_table[stats_table['mode'] == 'confined']['cage_area (nm2)'].mean()
+        tau_conf = stats_table[stats_table['mode'] == 'confined']['lifetime_s'].mean()
+        area_conf = stats_table[stats_table['mode'] == 'confined']['area_nm2'].mean()
         
         print('{} confined events; avg lifetime = {:.3}s; avg cage_area = {:.3} nm2'.format(n_conf, tau_conf, area_conf))
         
