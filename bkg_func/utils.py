@@ -46,18 +46,18 @@ def SingleTrack(data, track):
     
     return track
 
-def plotSingleTrack(track, color = 'peachpuff', start = 0 , end = -1):
+def plotSingleTrack(track, color = 'steelblue', start = 0 , end = -1):
    '''plot a single track, from start to end position'''
    
-   fig, ax = plt.subplots(figsize = (4,3), dpi = 120)
+   fig, ax = plt.subplots(figsize = (4,3), dpi = 150)
     
    # plot window to add sub segments
    if end == -1: end = track.shape[0]
    track = track.reset_index(drop=True)
    track = track.loc[start:end]
     
-   plt.plot(track.POSITION_X, track.POSITION_Y, '-o', lw = 2, color = color,
-             markersize = 6, markeredgecolor = 'black', markeredgewidth = 0.8); plt.axis('off');
+   plt.plot(track.POSITION_X, track.POSITION_Y, '-o', lw = 0.8, color = color, alpha = 0.6, 
+             markersize = 3, markeredgecolor = 'black', markeredgewidth = 0.2); plt.axis('off');
      
 def color_pick(p, thres = 1000, colors = ['steelblue', 'crimson']):
     if p >= thres:

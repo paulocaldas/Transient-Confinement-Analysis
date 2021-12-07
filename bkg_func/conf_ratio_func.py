@@ -116,7 +116,7 @@ def PlotParameterTunnig(param, thres = 1500, ylim = None, log = False):
     # set ylim 
     
     if ylim == None: 
-        ax.set_ylim([0, 10 * thres])
+        ax.set_ylim([0, np.max(y) + thres])
     else:
         ax.set_ylim([0, ylim])
         #'tracks with confined regions: {}/{}'.format(tracks_w_confinement, len(all_tracks_stats))
@@ -222,27 +222,32 @@ def DenoiseTransitionPoints(track_score, transition_points,  frame_rate, t_thres
     
     return track_score
 
-def PlotConfinedRegions(track, track_score, col = 'confined', colors = ['crimson','peachpuff']):
+def PlotConfinedRegions(track, track_score, col = 'confined', colors = ['crimson','steelblue']):
     '''takes original track table and track_score table to plot trajectory color code'''
     
-    fig, ax = plt.subplots(figsize = (4,3), dpi = 120)
+    fig, ax = plt.subplots(figsize = (4,3), dpi = 150)
     
     # plot all points from raw track in gray 
-    plt.plot(track.POSITION_X, track.POSITION_Y,'-', lw = 2, markersize = 6,
-             markeredgecolor = 'black', color = 'peachpuff', alpha = 1)
+    plt.plot(track.POSITION_X, track.POSITION_Y, '-', lw = 1, markersize = 3,
+             markeredgecolor = 'black', color = colors[1], alpha = 0.4)
     
     # color in red the confined data points from the score track table
     
     for i, row in track_score.iterrows():
             
-        if row[col] == True: color = colors[0]
-        else: color = colors[1]
+        if row[col] == True: 
+            color = colors[0]
+            size = 4
+        
+        else: 
+            color = colors[1]
+            size = 3
     
-        plt.plot(row.POSITION_X, row.POSITION_Y, 'o', lw = 1.2, markersize = 6, 
-                 markeredgecolor = 'black', markeredgewidth = 1, color = color, alpha = 1)
+        plt.plot(row.POSITION_X, row.POSITION_Y, 'o', lw = 0.8, markersize = size, 
+                 markeredgecolor = 'black', markeredgewidth = 0.2, color = color, alpha = 0.6)
         
     # add starting point and end point
-    kwargs = {'markeredgecolor': 'black', 'markersize':6}
+    kwargs = {'markeredgecolor': 'black', 'markersize':3, 'markeredgewidth': 0.2}
     plt.plot(track.POSITION_X.iloc[0], track.POSITION_Y.iloc[0], 'o', markerfacecolor = 'seagreen', **kwargs)
     plt.plot(track.POSITION_X.iloc[-1], track.POSITION_Y.iloc[-1], 'o', markerfacecolor = 'violet', **kwargs)
     
@@ -296,7 +301,7 @@ def ComputeSubSegmentStats(track_score_denoised, frame_rate, col = 'confined'):
         if sub_segment[col].iloc[0] == True:
             params.append(['confined', conf_ratio, lifetime, round(cage_area,0), round(dist,0), sub_segment.shape[0]])
         else:
-            params.append(['free_diff', conf_ratio, lifetime, round(cage_area,0), sub_segment.shape[0]])      
+            params.append(['free_diff', conf_ratio, lifetime, round(cage_area,0), round(dist,0), sub_segment.shape[0]])      
             
     return pd.DataFrame(params, columns=['mode', 'p_coeff_um-2', 'lifetime_s', 'area_nm2', 'distance_nm', 'steps'])
 

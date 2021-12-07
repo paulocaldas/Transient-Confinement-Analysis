@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 from bkg_func.conf_ratio_func import ComputeConfinementRatioScore, FindTransitionPoints, DenoiseTransitionPoints
 from bkg_func.conf_ratio_func import ComputeSubSegmentStats
 
@@ -20,10 +21,8 @@ def AnalyzeAllTracks(all_tracks, frame_rate, tracks = -1, w = 10, p_thres = 1500
     table = all_tracks.copy()
     
     # truncate number of tracks to analyze; default is -1 to analyze eveything
-    
     if tracks == -1: 
         table = table
-
     else:
         trunc = table[table['TRACK_ID'] == (tracks-1)].index[-1]
         table = table.iloc[:trunc]
@@ -33,8 +32,8 @@ def AnalyzeAllTracks(all_tracks, frame_rate, tracks = -1, w = 10, p_thres = 1500
     all_tracks_stats = []
     
     for i, track in table.groupby('TRACK_ID'):
-        # check if trajectory is just noise (i.e empty tracks)
-            
+        
+        # check if trajectory is just noise (i.e empty tracks, short track)
         noise = (track[~track.duplicated(['POSITION_X', 'POSITION_Y'])].shape[0] < 10)
         
         if noise == False:
@@ -85,7 +84,7 @@ def PlotOutputStuff(all_tracks_stats):
         conf_events_per_tracks.append(track[track[mode_col] == 'confined'].shape[0])
     
     # plot stuff
-    fig, ax = plt.subplots(1, 3, figsize = (8, 2.5), dpi = 150)
+    fig, ax = plt.subplots(1, 3, figsize = (8, 2), dpi = 140)
     fig.subplots_adjust(wspace = 0.4)
     
     # lifetimes 
@@ -104,16 +103,17 @@ def PlotOutputStuff(all_tracks_stats):
     
     ax[0].set_title('time under confinement \n vs. free diffusion', fontsize = 8)
     ax[0].set_ylabel('subdiffusion lifetime (s)', fontsize = 9); #ax.set_xlabel('type of motion', fontsize = 11);
-    ax[0].tick_params(direction = 'out', bottom = False, labelsize=9)
+    ax[0].tick_params(direction = 'out', bottom = False, labelsize = 8)
     
-    ax[1].set_title('confinement area \n for all sub-trajectories', fontsize = 8)
-    ax[1].set_ylabel('confinement area (nm2)', fontsize = 9); 
-    ax[1].tick_params(direction = 'out', bottom = False, labelsize=9)
+    ax[2].set_title('confinement area \n for all sub-trajectories', fontsize = 8)
+    ax[2].set_ylabel('confinement area ($\mathregular{nm^{-2}}$)', fontsize = 8); 
+    ax[2].tick_params(direction = 'out', bottom = False, labelsize = 8)
     
-    ax[2].set_title('number of confined \n events per track', fontsize = 8)
-    ax[2].set_ylabel('number of tracks', fontsize = 9); 
-    ax[2].set_xlabel('number of confined events', fontsize = 8); 
-    ax[2].tick_params(direction = 'out', bottom = False, labelsize=9)
+    ax[1].set_title('number of confined \n events per track', fontsize = 8)
+    ax[1].set_ylabel('number of tracks', fontsize = 8); 
+    ax[1].set_xlabel('number of confined events', fontsize = 7); 
+    ax[1].tick_params(direction = 'out', bottom = False, labelsize=8)
+    ax[1].yaxis.set_major_locator(MaxNLocator(integer = True))
     #ax[2].set_xlim([-1, np.max(conf_events_per_tracks) + 1]);
     
     

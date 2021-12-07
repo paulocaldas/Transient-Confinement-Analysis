@@ -15,12 +15,13 @@ from bkg_func.multiple_track_func import AnalyzeAllTracks, PlotOutputStuff, Trim
 
 def ReadTracks(file, minlen):
     '''reads file into a dataframe, extracts frame rate and number of tracks'''
-    table, rate, n_tracks = read_trackmate_xml_tracks(file)
+    table, rate, total_tracks = read_trackmate_xml_tracks(file)
     
     # apply filter for minimum lenght
     table = FilterTracks(table, minlen)
     n_tracks = table.TRACK_ID.unique().max() 
-    print('{} total tracks; filtering shorter than {} frames ({:.3} sec)'.format(int(n_tracks), minlen, minlen*rate))    
+    
+    print('{}/{} tracks; filter > {} frames ({:.3} sec)'.format(int(n_tracks), int(total_tracks), minlen, minlen*rate))    
 
     return table, rate, n_tracks
 
@@ -80,20 +81,31 @@ def TrajectoryClassificationAllFiles(folder, min_track_len = 30, tracks = 30, wi
     '''save output table for all xml files in folder
     by default output_folder is the same as the file directory'''
     
-    #print('files to analyze : {}'.format(glob.glob(folder + '/*.xml')))
+    # check if the folder exists and if it's not empty
     
-    for file in glob.glob(folder + '/*.xml'):
+    if os.path.exists(folder) == False:
+        print('ERROR: folder does not exist')
+    
+    if len([file for file in os.listdir(folder) if file.endswith(".xml")]) == 0:
+        print("no xml files in this directory")
         
-        print('Analyze All Tracks for {}'.format(os.path.basename(file)))
-        
-        with HiddenPrints():
+    else:
+
+        print('processing files:')
+        for file in glob.glob(folder + '/*.xml'):
             
-            all_tracks_stats = TrajectoryClassificationAllTracks(file, min_track_len = min_track_len, tracks = tracks, 
-                            window = window, p_thres = p_thres, t_thres = t_thres, 
-                            trim_trajectory_ends = trim_trajectory_ends,
-                            output_folder = output_folder)
-    print('done')
-    
+            print('Analyze All Tracks for {}'.format(os.path.basename(file)))
+            
+            with HiddenPrints():
+                
+                all_tracks_stats = TrajectoryClassificationAllTracks(file, min_track_len = min_track_len, tracks = tracks, 
+                                   window = window, p_thres = p_thres, t_thres = t_thres, 
+                                   trim_trajectory_ends = trim_trajectory_ends,
+                                   output_folder = output_folder)
+        print('done')
+        
+        return
+        
 class HiddenPrints:
     def __enter__(self):
         self._original_stdout = sys.stdout
