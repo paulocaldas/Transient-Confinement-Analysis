@@ -105,15 +105,15 @@ def PlotOutputStuff(all_tracks_stats):
     ax[0].set_ylabel('subdiffusion lifetime (s)', fontsize = 9); #ax.set_xlabel('type of motion', fontsize = 11);
     ax[0].tick_params(direction = 'out', bottom = False, labelsize = 8)
     
-    ax[2].set_title('confinement area \n for all sub-trajectories', fontsize = 8)
-    ax[2].set_ylabel('confinement area ($\mathregular{nm^{-2}}$)', fontsize = 8); 
-    ax[2].tick_params(direction = 'out', bottom = False, labelsize = 8)
+    ax[1].set_title('confinement area \n for all sub-trajectories', fontsize = 8)
+    ax[1].set_ylabel('confinement area ($\mathregular{nm^{-2}}$)', fontsize = 8); 
+    ax[1].tick_params(direction = 'out', bottom = False, labelsize = 8)
     
-    ax[1].set_title('number of confined \n events per track', fontsize = 8)
-    ax[1].set_ylabel('number of tracks', fontsize = 8); 
-    ax[1].set_xlabel('number of confined events', fontsize = 7); 
-    ax[1].tick_params(direction = 'out', bottom = False, labelsize=8)
-    ax[1].yaxis.set_major_locator(MaxNLocator(integer = True))
+    ax[2].set_title('number of confined \n events per track', fontsize = 8)
+    ax[2].set_ylabel('number of tracks', fontsize = 8); 
+    ax[2].set_xlabel('number of confined events', fontsize = 7); 
+    ax[2].tick_params(direction = 'out', bottom = False, labelsize=8)
+    ax[2].yaxis.set_major_locator(MaxNLocator(integer = True))
     #ax[2].set_xlim([-1, np.max(conf_events_per_tracks) + 1]);
     
     

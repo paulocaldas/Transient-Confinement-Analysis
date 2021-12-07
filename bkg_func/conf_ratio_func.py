@@ -64,7 +64,7 @@ def TuneConfinementThreshold(track, frame_rate, conf_thres = 1500, windows = [5,
     '''computes the confinement ratio using different window sizes (windows)
     and returns a list with conf_ratio per position for each window size'''
     
-    print('rolling windows: {} frames'.format(windows))
+    print('rolling windows: {} frames ~ {} sec'.format(windows, list(np.array(windows) * frame_rate)))
     
     conf_ratios = []  # save all confinement ratios and respective rolling window size
 
@@ -81,11 +81,11 @@ def TuneConfinementThreshold(track, frame_rate, conf_thres = 1500, windows = [5,
 
             # compute confinement ratio
             conf_ratio = ConfinementRatio(segment)
-            conf_ratios.append([conf_ratio,window_size])
+            conf_ratios.append([conf_ratio, window_size])
     
     return conf_ratios
 
-def PlotParameterTunnig(param, thres = 1500, ylim = None, log = False):
+def PlotParameterTunnig(param, frame_rate, thres = 800, ylim = None, log = False,):
     '''takes the output of TuneConfinementThreshold to plot the results'''
     
     rol_windows = np.unique([j for i,j in param]) # reads each par coef_ratio, window_size
@@ -94,14 +94,14 @@ def PlotParameterTunnig(param, thres = 1500, ylim = None, log = False):
     fig, ax = plt.subplots(figsize = (8, 3), dpi = 120)
     # plot conf_ratio vs. position along the track, for each window_size
     for w in rol_windows:
-        x = np.arange(0, df[df['window_size'] == w].shape[0])
+        x = np.arange(0, df[df['window_size'] == w].shape[0]) * frame_rate
         y = df[df['window_size'] == w]['conf_ratio']
         
-        plt.plot(x,y, lw= 1.5, label = w, color = plt.cm.viridis(w*15))
+        plt.plot(x,y, lw= 1.5, label = w, color = plt.cm.viridis(w*3))
     
     plt.legend(title= "wind_size", fontsize=7, title_fontsize=7, loc = 0, frameon = False)
-    ax.set_xlabel('start position (#)'); 
-    ax.set_ylabel('confinement ratio (p)');
+    ax.set_xlabel('start position (sec)'); 
+    ax.set_ylabel('confinement ratio ($\mathregular{nm^{-2}}$)');
     ax.yaxis.set_major_formatter(FormatStrFormatter('%.0f'));
     
     # threhsold for confinement ratio
@@ -222,7 +222,7 @@ def DenoiseTransitionPoints(track_score, transition_points,  frame_rate, t_thres
     
     return track_score
 
-def PlotConfinedRegions(track, track_score, col = 'confined', colors = ['crimson','steelblue']):
+def PlotConfinedRegions(track, track_score, col = 'confined', colors = ['red','steelblue']):
     '''takes original track table and track_score table to plot trajectory color code'''
     
     fig, ax = plt.subplots(figsize = (4,3), dpi = 150)
@@ -237,19 +237,19 @@ def PlotConfinedRegions(track, track_score, col = 'confined', colors = ['crimson
             
         if row[col] == True: 
             color = colors[0]
-            size = 4
+            size = 3.5
         
         else: 
             color = colors[1]
             size = 3
     
         plt.plot(row.POSITION_X, row.POSITION_Y, 'o', lw = 0.8, markersize = size, 
-                 markeredgecolor = 'black', markeredgewidth = 0.2, color = color, alpha = 0.6)
+                 markeredgecolor = 'black', markeredgewidth = 0.2, color = color, alpha = 0.5)
         
     # add starting point and end point
     kwargs = {'markeredgecolor': 'black', 'markersize':3, 'markeredgewidth': 0.2}
-    plt.plot(track.POSITION_X.iloc[0], track.POSITION_Y.iloc[0], 'o', markerfacecolor = 'seagreen', **kwargs)
-    plt.plot(track.POSITION_X.iloc[-1], track.POSITION_Y.iloc[-1], 'o', markerfacecolor = 'violet', **kwargs)
+    plt.plot(track.POSITION_X.iloc[0], track.POSITION_Y.iloc[0], 'o', markerfacecolor = 'darkgreen', **kwargs)
+    plt.plot(track.POSITION_X.iloc[-1], track.POSITION_Y.iloc[-1], 'o', markerfacecolor = 'red', **kwargs)
     
     # format plot
     ax.set_xlabel('X ($\mu m$)'); ax.set_ylabel('Y ($\mu m$)'); ax.axis('off');

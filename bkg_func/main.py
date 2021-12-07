@@ -3,7 +3,7 @@
 import pandas as pd
 import numpy as np
 import os, glob, sys
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 #import seaborn as sns
 #from matplotlib.ticker import FormatStrFormatter
 
@@ -102,6 +102,10 @@ def TrajectoryClassificationAllFiles(folder, min_track_len = 30, tracks = 30, wi
                                    window = window, p_thres = p_thres, t_thres = t_thres, 
                                    trim_trajectory_ends = trim_trajectory_ends,
                                    output_folder = output_folder)
+            
+            # prevent plotting when running this function
+            plt.close()
+            
         print('done')
         
         return
