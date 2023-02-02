@@ -21,7 +21,7 @@ def ReadTracks(file, minlen):
     table = FilterTracks(table, minlen)
     n_tracks = table.TRACK_ID.unique().max() 
     
-    print('{}/{} tracks; filter > {} frames ({:.3} sec)'.format(int(n_tracks), int(total_tracks), minlen, minlen*rate))    
+    print('{}/{} tracks; filter > {} frames ({:.3} sec)'.format(int(n_tracks + 1), int(total_tracks), minlen, minlen*rate))    
 
     return table, rate, n_tracks
 

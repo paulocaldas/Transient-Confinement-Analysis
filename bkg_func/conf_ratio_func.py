@@ -243,7 +243,7 @@ def PlotConfinedRegions(track, track_score, col = 'confined', colors = ['red','s
             color = colors[1]
             size = 3
     
-        plt.plot(row.POSITION_X, row.POSITION_Y, 'o', lw = 0.8, markersize = size, 
+        plt.plot(row.POSITION_X, row.POSITION_Y, 'o', lw = 1.2, markersize = size, 
                  markeredgecolor = 'black', markeredgewidth = 0.2, color = color, alpha = 0.5)
         
     # add starting point and end point

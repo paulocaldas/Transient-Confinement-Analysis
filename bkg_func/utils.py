@@ -56,7 +56,7 @@ def plotSingleTrack(track, color = 'steelblue', start = 0 , end = -1):
    track = track.reset_index(drop=True)
    track = track.loc[start:end]
     
-   plt.plot(track.POSITION_X, track.POSITION_Y, '-o', lw = 0.8, color = color, alpha = 0.6, 
+   plt.plot(track.POSITION_X, track.POSITION_Y, '-o', lw = 1.2, color = color, alpha = 0.6, 
              markersize = 3, markeredgecolor = 'black', markeredgewidth = 0.2); plt.axis('off');
      
 def color_pick(p, thres = 1000, colors = ['steelblue', 'crimson']):
