@@ -22,7 +22,7 @@ can suppress the detection of apparent non-random behaviors. These parameters de
 Too large windows will not detect properly the confinement period, while the statistical uncertainty increases in shorter windows. 
 Thus, to accurately detect confinement periods, the window size should be adjusted accordingly to the acquisition rate and other experimental features.
 
-![alt text](https://github.com/paulocaldas/Transient-Confinement-Analysis/blob/main/transient_confinement_illustration.png)
+![Illustration](https://github.com/paulocaldas/Transient-Confinement-Analysis/assets/49621351/a0509ec7-fb77-4820-82c2-ed6635f5f523)
 
 ### Parameters
 
