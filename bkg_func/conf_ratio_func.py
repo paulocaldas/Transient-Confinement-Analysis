@@ -8,6 +8,8 @@ from matplotlib.ticker import FormatStrFormatter
 from scipy.spatial import ConvexHull
 from bkg_func.utils import ComputeDirectionality
 
+# FUNCTIONS TO COMPUTE THE CONFINEMENT RATIO ALONG A GIVEN TRACK
+
 def ComputeSquareDisplacement(track_table, coord = ['POSITION_X','POSITION_Y']):
     '''estimates the sum of square distances along step size of a given track '''
     
@@ -58,7 +60,7 @@ def ConfinementRatio(track_table, X='POSITION_X', Y = 'POSITION_Y'):
     
     return segment_pc
 	
-# functions to compute and visualize confinement ratio along a given track
+# FUNCTIONS TO COMPUTE AND VISUALIZE CONFINEMENT RATIO ALONG A GIVEN TRACK
 
 def TuneConfinementThreshold(track, frame_rate, conf_thres = 1500, windows = [5, 8, 12]):
     '''computes the confinement ratio using different window sizes (windows)
@@ -97,7 +99,7 @@ def PlotParameterTunnig(param, frame_rate, thres = 800, ylim = None, log = False
         x = np.arange(0, df[df['window_size'] == w].shape[0]) * frame_rate
         y = df[df['window_size'] == w]['conf_ratio']
         
-        plt.plot(x,y, lw= 1.5, label = w, color = plt.cm.viridis(w*3))
+        plt.plot(x,y, lw= 1.5, label = w, color = plt.cm.tab20b(w))
     
     plt.legend(title= "wind_size", fontsize=7, title_fontsize=7, loc = 0, frameon = False)
     ax.set_xlabel('start position (sec)'); 

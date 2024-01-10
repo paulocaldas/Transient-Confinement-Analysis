@@ -19,6 +19,12 @@ def read_trackmate_xml_tracks(xml_file):
                                    float(spots.attrib.get('y'))])
 
     track_table = pd.DataFrame(attributes, columns=['TRACK_ID','FRAME','POSITION_X','POSITION_Y'])
+    
+    # Apply a small perturbation to avoid overlapping points
+    epsilon = 1e-6
+    track_table['POSITION_X'] += np.random.uniform(-epsilon, epsilon, len(track_table))
+    track_table['POSITION_Y'] += np.random.uniform(-epsilon, epsilon, len(track_table))
+
     return track_table, frame_interval, n_tracks
 
 def FilterTracks(traj_table, minlen):

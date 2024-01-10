@@ -12,6 +12,9 @@ from bkg_func.conf_ratio_func import ComputeConfinementRatioScore, FindTransitio
 from bkg_func.conf_ratio_func import ComputeSubSegmentStats, PlotConfinedRegions, ShowStats
 from bkg_func.multiple_track_func import AnalyzeAllTracks, PlotOutputStuff, TrimEnds
 
+# quick fix for copy of slice from dataframe - should fixed properly later
+import warnings
+warnings.filterwarnings("ignore")
 
 def ReadTracks(file, minlen):
     '''reads file into a dataframe, extracts frame rate and number of tracks'''
@@ -53,11 +56,11 @@ def TrajectoryClassificationAllTracks(file, min_track_len = 30, tracks = 30, win
     
     all_tracks_stats = AnalyzeAllTracks(all_tracks, frame_rate, tracks = tracks, w = window, p_thres = p_thres, t_thres = t_thres)
     
-    # discard all confined motions identified at the begnning and end of each track
+    # discard all confined motions identified at the beginning and end of each track
     if trim_trajectory_ends == True:
         all_tracks_stats = TrimEnds(all_tracks_stats)
         
-    # merge all tracks into a master table and save output
+    # merge all tracks into a master table and save the output
     all_tracks_stats = pd.concat(all_tracks_stats, ignore_index = True)
     
     if output_folder == None:
